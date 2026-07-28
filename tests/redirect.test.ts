@@ -10,6 +10,6 @@ test.describe('Main page redirect test', () => {
         const helpPage = new HelpPage(newPage);
         await helpPage.search("Node Management");
         await expect(newPage).toHaveURL(/\/help\/docs\/Control-Server-User-Guide\/Node-Management/);
-        await expect(newPage.getByText("Node Management").first()).toBeVisible();
+        await expect(newPage.getByRole('heading', { name: 'Node Management', exact: false })).toBeVisible();
     });
 });
