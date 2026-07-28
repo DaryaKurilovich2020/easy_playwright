@@ -1,11 +1,11 @@
 import {test as base} from '@playwright/test';
 import {LoginPage} from "../pages/LoginPage";
-import {BasePage} from "../pages/BasePage";
 import {VALID_LOGIN_DATA} from "../test-data/login.testdata";
+import {MainPage} from "../pages/MainPage";
 
 type AuthFixture = {
     loginPage: LoginPage;
-    mainPage: BasePage;
+    mainPage: MainPage;
 };
 
 export const test = base.extend<AuthFixture>({
@@ -19,8 +19,8 @@ export const test = base.extend<AuthFixture>({
         const loginPage = new LoginPage(page);
         await loginPage.open();
         await loginPage.login(VALID_LOGIN_DATA.username, VALID_LOGIN_DATA.password);
-        const basePage = new BasePage(page);
-        await use(basePage);
+        const mainPage = new MainPage(page);
+        await use(mainPage);
     },
 });
 

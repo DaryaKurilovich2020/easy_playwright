@@ -5,22 +5,26 @@ export const VALID_LOGIN_DATA = {
 
 export const INVALID_LOGIN_DATA = [
     {
+        description: "empty credentials",
         username: "",
         password: ""
     },
 
     {
+        description: "empty password",
         username: "testautomation",
         password: ""
 
     },
 
     {
+        description: "empty username",
         username: "",
         password: "Password1234"
     },
 
     {
+        description: "invalid credentials",
         username: "incorrect",
         password: "incorrect"
     }
