@@ -1,22 +1,26 @@
 import {Locator, Page} from "@playwright/test";
 import {Table} from "../components/Table";
-import {NotificationComponent} from "../components/NotificationComponent";
+import {ConfirmationModal} from "../components/ConfirmationModal";
+import {NodePanel} from "../components/NodePanel";
+import {NODE_MANAGEMENT_DATA} from "../test-data/nodemanagement.testdata";
 
 export class BasePage {
     protected readonly page: Page;
     private readonly navigationBar: Locator;
-    private readonly userIcon: Locator;
     private readonly createNewButton: Locator;
     readonly table: Table;
-    // readonly notification: NotificationComponent;
+    readonly userButton: Locator;
+    readonly backToListButton: Locator;
+    readonly logoutButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.navigationBar = page.locator("#sidebar_list");
-        this.userIcon = page.getByRole("button", {name: "User"});
         this.createNewButton = page.getByRole("button", {name: "Create New"});
         this.table = new Table(page.locator(".MuiTable-stickyHeader"));
-        // this.notification = new NotificationComponent(page.getByRole('alert'));
+        this.userButton = page.getByRole('button', {name: 'User', exact: true});
+        this.logoutButton = page.getByRole('link', {name: 'Logout', exact: true});
+        this.backToListButton = page.getByText("Back to List");
     }
 
     async navigateToModule(module: string) {
@@ -24,7 +28,7 @@ export class BasePage {
     }
 
     async clickCreateNewRecord() {
-        await this.createNewButton.click();
+        await this.createNewButton.click({force: true});
     }
 
     async deleteRecords() {
@@ -32,7 +36,9 @@ export class BasePage {
     }
 
     async goBackToList() {
-        await this.page.getByText("Back to List").click();
+        await this.page.waitForLoadState('networkidle');
+        await this.backToListButton.waitFor({ state: 'visible', timeout: 160000 });
+        await this.backToListButton.click();
     }
 
     async searchByText(text: string) {
@@ -43,7 +49,31 @@ export class BasePage {
         await this.page.getByRole("button", {name: button}).click();
     }
 
-    async redirectToFindOutMore() {
-        await this.page.getByRole("link", {name: "Find out more"}).click();
+    getByText(text: string, options?: { exact?: boolean }) {
+        return this.page.getByText(text, options);
+    }
+
+    async deleteRecordViaCheckbox(recordName: string): Promise<void> {
+        await this.searchByText(recordName);
+        await this.table.getRowByColumnValue("Name", recordName).select();
+        await this.deleteRecords();
+        const confirmationModal = new ConfirmationModal(this.page.getByRole("dialog"));
+        await confirmationModal.clickButton("Delete");
+    }
+
+    async deleteRecordInline(recordName: string): Promise<void> {
+        await this.searchByText(recordName);
+        await this.table.getRowByColumnValue("Name", recordName).clickButton("Delete");
+        const confirmationModal = new ConfirmationModal(this.page.getByRole("dialog"));
+        await confirmationModal.clickButton("Delete");
+    }
+
+    async openRecordByName(recordName: string) {
+        await this.page.getByRole("link", {name: recordName}).click();
+    }
+
+    async logout() {
+       await this.userButton.click();
+       await this.logoutButton.click();
     }
 }

@@ -1,15 +1,14 @@
 import {test as base} from '@playwright/test';
 import {LoginPage} from "../pages/LoginPage";
 import {VALID_LOGIN_DATA} from "../test-data/login.testdata";
-import {BasePage} from "../pages/BasePage";
 import {NodePanel} from "../components/NodePanel";
 import {NODE_MANAGEMENT_DATA} from "../test-data/nodemanagement.testdata";
-import {ConfirmationModal} from "../components/ConfirmationModal";
+import {NodePage} from "../pages/NodePage";
 
 type NodeManagementFixture = {
-    nodeManagementPage: BasePage;
+    nodeManagementPage: NodePage;
     createdNode: {
-        page: BasePage;
+        page: NodePage;
         nodeName: string;
     };
 };
@@ -19,9 +18,9 @@ export const test = base.extend<NodeManagementFixture>({
         const loginPage = new LoginPage(page);
         await loginPage.open();
         await loginPage.login(VALID_LOGIN_DATA.username, VALID_LOGIN_DATA.password);
-        const basePage = new BasePage(page);
-        await basePage.navigateToModule("Node Management")
-        await use(basePage);
+        const nodePage = new NodePage(page);
+        await nodePage.navigateToModule("Node Management")
+        await use(nodePage);
     },
 
     createdNode: async ({page, nodeManagementPage}, use) => {
@@ -34,22 +33,14 @@ export const test = base.extend<NodeManagementFixture>({
             await newNodeManagementPanel.details.setParameter(param, value);
         }
         await newNodeManagementPanel.clickNodeButton("Create");
+        const nodePage = new NodePage(page);
 
-        const basePage = new BasePage(page);
-        await basePage.goBackToList();
+        await nodePage.goBackToList();
 
         await use({
-            page: basePage,
+            page: nodePage,
             nodeName: nodeName,
         });
-
-        // await basePage.goBackToList();
-        await basePage.searchByText(nodeName);
-        const rowCount = await page.getByText(nodeName).count();
-        if (rowCount === 0) return;
-        await basePage.table.getRowByColumnValue("Name", nodeName).clickButton("Delete");
-        const confirmationModal = new ConfirmationModal(page.getByRole("dialog"));
-        await confirmationModal.clickButton("Delete");
     },
 
 });

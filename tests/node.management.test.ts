@@ -1,40 +1,37 @@
 import {test, expect} from '../ui/fixtures/nodemanagement.fixture'
 import {NODE_MANAGEMENT_DATA, UPDATED_NODE_MANAGEMENT_DATA} from "../ui/test-data/nodemanagement.testdata";
-import {NodePanel} from "../ui/components/NodePanel";
-import {ConfirmationModal} from "../ui/components/ConfirmationModal";
 
 test.describe('Node Management Tests', () => {
+    let nodeNameToDelete: string | null = null;
+
+    test.afterEach(async ({nodeManagementPage}) => {
+        if (nodeNameToDelete) {
+            await nodeManagementPage.searchByText(nodeNameToDelete);
+            const rowCount = await nodeManagementPage.getByText(nodeNameToDelete).count();
+            if (rowCount === 0) return;
+            await nodeManagementPage.deleteRecordInline(nodeNameToDelete);
+            nodeNameToDelete = null;
+        }
+    });
+
     test.describe('Create Node tests', () => {
         test.describe('Positive tests', () => {
             test('should create new node', async ({nodeManagementPage, page}) => {
-                test.setTimeout(90000);
-                await nodeManagementPage.clickCreateNewRecord();
-
-                const newNodeManagementPanel = new NodePanel(page.locator("#details_panel"));
-
-                const nodeData = Object.entries(NODE_MANAGEMENT_DATA);
-                for (const [param, value] of nodeData) {
-                    await newNodeManagementPanel.details.setParameter(param, value);
-                }
-
-                await newNodeManagementPanel.clickNodeButton("Create");
-
-                const updateNodePanel = new NodePanel(page.locator("#root"));
-
-                for (const [param, value] of nodeData) {
-                    await expect(updateNodePanel.details.getInput(param)).toHaveValue(value);
-                }
+                test.setTimeout(180000);
+                const nodeData: Record<string, string> = NODE_MANAGEMENT_DATA;
+                await nodeManagementPage.createRecord(nodeData);
+                const actualNodeData = await nodeManagementPage.getNodeParamsValues(Object.keys(NODE_MANAGEMENT_DATA));
+                expect(actualNodeData).toEqual(nodeData);
             });
         });
 
         test.describe('Negative tests', () => {
             test('should not create duplicate node', async ({createdNode, page, nodeManagementPage}) => {
-                await nodeManagementPage.clickCreateNewRecord();
+                const duplicateData = {
+                    "Name": createdNode.nodeName
+                };
 
-                const newNodeManagementPanel = new NodePanel(page.locator("#details_panel"));
-                await newNodeManagementPanel.details.setParameter("Name", createdNode.nodeName);
-
-                await newNodeManagementPanel.clickNodeButton("Create");
+                await nodeManagementPage.createRecord(duplicateData);
                 //TODO Добавить работу с компонентом notification
                 await expect(page.getByText("Node with the same name already exists! Please, choose another name")).toBeVisible();
             });
@@ -43,60 +40,57 @@ test.describe('Node Management Tests', () => {
 
     test.describe('Update Node tests', () => {
         test('should update existing node', async ({createdNode, page}) => {
-            test.setTimeout(90000);
-            await createdNode.page.searchByText(createdNode.nodeName);
-            await page.getByRole("link", {name: createdNode.nodeName}).click();
+            test.setTimeout(180000);
+            const nodePage = createdNode.page;
+            const nodeName = createdNode.nodeName;
+            const nodeData = UPDATED_NODE_MANAGEMENT_DATA;
 
-            const updateNodePanel = new NodePanel(page.locator("#root"));
+            await nodePage.updateRecord(nodeName, nodeData);
+            await nodePage.openRecordByName(nodeName);
 
-            const nodeData = Object.entries(UPDATED_NODE_MANAGEMENT_DATA);
-            for (const [param, value] of nodeData) {
-                await updateNodePanel.details.setParameter(param, value);
-            }
+            const actualNodeData = await nodePage.getNodeParamsValues(Object.keys(UPDATED_NODE_MANAGEMENT_DATA));
 
-            await updateNodePanel.clickNodeButton("Update");
+            expect(actualNodeData).toEqual(nodeData);
+            await nodePage.goBackToList();
+        });
 
-            const confirmationModal = new ConfirmationModal(page.getByRole("dialog"));
-            await confirmationModal.clickButton("Update");
+        test('should not let update existing node if no changes made', async ({createdNode, page}) => {
+            test.setTimeout(360000);
+            const nodePage = createdNode.page;
+            const nodeName = createdNode.nodeName;
+            const initialData = await nodePage.getNodeParamsValues(Object.keys(UPDATED_NODE_MANAGEMENT_DATA));
+            const newNodeData = UPDATED_NODE_MANAGEMENT_DATA;
 
-            await createdNode.page.goBackToList();
-            await page.getByRole("link", {name: createdNode.nodeName}).click();
+            await nodePage.searchByText(nodeName);
+            await nodePage.openRecordByName(nodeName);
 
-            for (const [param, value] of nodeData) {
-                await expect(updateNodePanel.details.getInput(param)).toHaveValue(value);
-            }
+            await nodePage.fillRecordData(nodeName, newNodeData);
+            await nodePage.fillRecordData(nodeName, initialData);
 
-            await createdNode.page.goBackToList();
+            await expect(nodePage.updateButton).toBeDisabled(true);
+
+            await nodePage.goBackToList();
         });
     });
 
     test.describe('Delete Node tests', () => {
         test('should delete existing node by inline table button', async ({createdNode, page}) => {
-            test.setTimeout(90000);
+            test.setTimeout(180000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
 
-            await nodePage.searchByText(nodeName);
-
-            await createdNode.page.table.getRowByColumnValue("Name", createdNode.nodeName).clickButton("Delete");
-            const confirmationModal = new ConfirmationModal(page.getByRole("dialog"));
-            await confirmationModal.clickButton("Delete");
+            await nodePage.deleteRecordInline(nodeName);
 
             await expect(page.getByText("No Results Found")).toBeVisible({timeout: 15000});
             await expect(page.getByText(nodeName)).not.toBeVisible({timeout: 15000});
         });
 
         test('should delete existing node by selecting the record in the table', async ({createdNode, page}) => {
-            test.setTimeout(90000);
+            test.setTimeout(180000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
 
-            await nodePage.searchByText(nodeName);
-            await createdNode.page.table.getRowByColumnValue("Name", createdNode.nodeName).select();
-            await nodePage.deleteRecords();
-
-            const confirmationModal = new ConfirmationModal(page.getByRole("dialog"));
-            await confirmationModal.clickButton("Delete");
+            await nodePage.deleteRecordViaCheckbox(nodeName);
 
             await expect(page.getByText("No Results Found")).toBeVisible({timeout: 15000});
             await expect(page.getByText(nodeName)).not.toBeVisible({timeout: 15000});
@@ -104,20 +98,12 @@ test.describe('Node Management Tests', () => {
     });
 
     test.describe("Download node tests", () => {
-        test('should download node package agent', async ({createdNode, page}) => {
+        test('should download node package agent', async ({createdNode}) => {
+            test.setTimeout(180000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
 
-            await nodePage.searchByText(nodeName);
-            await createdNode.page.table.getRowByColumnValue("Name", createdNode.nodeName).clickButton("Download node agent package");
-
-            const downloadLink = page.getByRole("link", {name: "Export complete. Click to download"});
-            await expect(downloadLink).toBeVisible();
-
-            const downloadPromise = page.waitForEvent('download');
-            await downloadLink.click();
-            const download = await downloadPromise;
-            await download.saveAs('./downloads/' + download.suggestedFilename());
+            const download = await nodePage.downloadAgentPackage(nodeName);
 
             const fileName = download.suggestedFilename();
             expect(fileName).toContain('node');

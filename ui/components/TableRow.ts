@@ -11,14 +11,23 @@ export class TableRow {
     async select() {
         await this.rootLocator.getByRole('checkbox').check();
     }
-    async clickButton(buttonName: string) {
-        const targetElement = this.rootLocator
-            .locator('td')
-            .last()
-            .locator(`[aria-label*="${buttonName}" i]`);
+    // async clickButton(buttonName: string) {
+    //     const targetElement = this.rootLocator
+    //         .locator('td')
+    //         .last()
+    //         .locator(`[aria-label*="${buttonName}" i]`);
+    //
+    //     await targetElement.click();
+    // }
 
-        await targetElement.click();
+    async clickButton(buttonName: string): Promise<void> {
+        // Ищем элемент с aria-label по всей строке, без привязки к .last()
+        const targetElement = this.rootLocator.locator(`[aria-label*="${buttonName}" i]`);
+
+        // Если кнопок с похожим aria-label вдруг несколько, берем первую для стабильности
+        await targetElement.first().click();
     }
+
 
 
 }
