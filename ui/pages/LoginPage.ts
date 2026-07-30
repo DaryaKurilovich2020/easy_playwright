@@ -2,13 +2,13 @@ import {Locator, Page} from "@playwright/test";
 
 export class LoginPage {
     private readonly page: Page;
-    private readonly loginInput: Locator;
-    private readonly passwordInput: Locator;
-    private readonly loginButton: Locator;
+    readonly loginInput: Locator;
+    readonly passwordInput: Locator;
+    readonly loginButton: Locator;
     readonly errorBlock: Locator;
 
     async open() {
-        this.page.goto('/authrpa/login');
+        await this.page.goto('/authrpa/login');
     }
 
     constructor(page: Page) {
@@ -19,7 +19,7 @@ export class LoginPage {
         this.errorBlock = page.locator(("div#error_block"));
     }
 
-    async login(username:string, password:string) {
+    async login(username: string, password: string) {
         await this.loginInput.fill(username);
         await this.passwordInput.fill(password);
         await this.loginButton.click();

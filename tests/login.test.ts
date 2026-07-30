@@ -9,6 +9,10 @@ test.describe('Login tests', () => {
             const mainPage = new MainPage(page);
             await expect(mainPage.getByText("EasyRPA Control Server", {exact: false})).toBeVisible();
             await expect(mainPage.userButton).toBeVisible();
+            await mainPage.logout();
+            await expect(page).toHaveURL('/authrpa/login');
+            await expect(loginPage.loginInput).toBeVisible();
+            await expect(loginPage.passwordInput).toBeVisible();
         });
     });
 
