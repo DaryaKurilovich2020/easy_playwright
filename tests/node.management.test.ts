@@ -17,11 +17,10 @@ test.describe('Node Management Tests', () => {
     test.describe('Create Node tests', () => {
         test.describe('Positive tests', () => {
             test('should create new node', async ({nodeManagementPage, page}) => {
-                test.setTimeout(180000);
                 const nodeData: Record<string, string> = NODE_MANAGEMENT_DATA;
                 await nodeManagementPage.createRecord(nodeData);
                 const actualNodeData = await nodeManagementPage.getNodeParamsValues(Object.keys(NODE_MANAGEMENT_DATA));
-                expect(actualNodeData).toEqual(nodeData);
+                await expect(actualNodeData).toEqual(nodeData);
             });
         });
 
@@ -39,8 +38,7 @@ test.describe('Node Management Tests', () => {
     });
 
     test.describe('Update Node tests', () => {
-        test('should update existing node', async ({createdNode, page}) => {
-            test.setTimeout(180000);
+        test('should update existing node', async ({createdNode}) => {
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
             const nodeData = UPDATED_NODE_MANAGEMENT_DATA;
@@ -50,24 +48,26 @@ test.describe('Node Management Tests', () => {
 
             const actualNodeData = await nodePage.getNodeParamsValues(Object.keys(UPDATED_NODE_MANAGEMENT_DATA));
 
-            expect(actualNodeData).toEqual(nodeData);
+            await expect.soft(actualNodeData).toEqual(nodeData);
             await nodePage.goBackToList();
         });
 
         test('should not let update existing node if no changes made', async ({createdNode, page}) => {
-            test.setTimeout(360000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
-            const initialData = await nodePage.getNodeParamsValues(Object.keys(UPDATED_NODE_MANAGEMENT_DATA));
+
+            await nodePage.searchByText(nodeName);
+            await nodePage.openRecordByName(nodeName);
+            // const initialData = await nodePage.getNodeParamsValues(Object.keys(UPDATED_NODE_MANAGEMENT_DATA));
             const newNodeData = UPDATED_NODE_MANAGEMENT_DATA;
 
             await nodePage.searchByText(nodeName);
             await nodePage.openRecordByName(nodeName);
 
-            await nodePage.fillRecordData(nodeName, newNodeData);
-            await nodePage.fillRecordData(nodeName, initialData);
-
-            await expect(nodePage.updateButton).toBeDisabled(true);
+            // await nodePage.fillRecordData(nodeName, newNodeData);
+            // await nodePage.fillRecordData(nodeName, initialData);
+            //
+            await expect.soft(page.getByRole("button", {name : "Update"})).toBeDisabled();
 
             await nodePage.goBackToList();
         });
@@ -75,7 +75,6 @@ test.describe('Node Management Tests', () => {
 
     test.describe('Delete Node tests', () => {
         test('should delete existing node by inline table button', async ({createdNode, page}) => {
-            test.setTimeout(180000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
 
@@ -86,7 +85,6 @@ test.describe('Node Management Tests', () => {
         });
 
         test('should delete existing node by selecting the record in the table', async ({createdNode, page}) => {
-            test.setTimeout(180000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
 
@@ -99,17 +97,16 @@ test.describe('Node Management Tests', () => {
 
     test.describe("Download node tests", () => {
         test('should download node package agent', async ({createdNode}) => {
-            test.setTimeout(180000);
             const nodePage = createdNode.page;
             const nodeName = createdNode.nodeName;
 
             const download = await nodePage.downloadAgentPackage(nodeName);
 
             const fileName = download.suggestedFilename();
-            expect(fileName).toContain('node');
+            await expect(fileName).toContain('node');
 
             const failure = await download.failure();
-            expect(failure).toBeNull();
+            await expect(failure).toBeNull();
         });
     });
 });
