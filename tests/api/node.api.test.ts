@@ -41,6 +41,20 @@ apiTest.describe('API: Isolated Node CRUD Operations', () => {
         expect(body.name).toBe(nodeName);
     });
 
+    apiTest('should download node details by ID', async ({nodeController}) => {
+        const response = await nodeController.downloadNode(activeNodeId);
+        expect(response.status()).toBe(200);
+
+        const contentType = response.headers()['content-type'];
+        expect(contentType).toContain('text/csv');
+
+        const fileBuffer = await response.body();
+        expect(fileBuffer.length).toBeGreaterThan(0);
+
+        const csvText = fileBuffer.toString('utf-8');
+        expect(csvText).toContain('key,value');
+    });
+
     apiTest('should UPDATE node fields successfully', async ({nodeController}) => {
         const updatedPayload = NodeDataFactory.updateNodePayload(nodeName);
 
