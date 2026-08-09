@@ -52,7 +52,7 @@ apiTest.describe('API: Isolated Node CRUD Operations', () => {
         expect(body.workDir).toBe(updatedPayload.workDir);
     });
 
-    apiTest('should DELETE the node and return 404 on next read', async ({nodeController}) => {
+    apiTest('should DELETE the node and return 403 on next read', async ({nodeController}) => {
         const response = await nodeController.deleteNode(activeNodeId);
         expect(response.status()).toBe(200);
 
