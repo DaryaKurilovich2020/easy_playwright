@@ -1,6 +1,6 @@
-import {test, expect} from '../ui/fixtures/auth.fixture'
-import {INVALID_LOGIN_DATA, VALID_LOGIN_DATA} from '../ui/test-data/login.testdata';
-import {MainPage} from "../ui/pages/MainPage";
+import {test, expect} from '../../ui/fixtures/auth.fixture'
+import {INVALID_LOGIN_DATA, VALID_LOGIN_DATA} from '../../test-data/ui/login.testdata';
+import {MainPage} from "../../ui/pages/MainPage";
 
 test.describe('Login tests', () => {
     test.describe('Positive tests', () => {
