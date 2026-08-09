@@ -22,4 +22,8 @@ export class NodeController {
     async deleteNode(id: number) {
         return await this.request.delete(`/api/v1/node/${id}`);
     }
+
+    async downloadNode(id: number) {
+        return await this.request.get(`/api/v1/node/${id}/params/download`);
+    }
 }
