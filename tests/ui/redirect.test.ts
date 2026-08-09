@@ -1,5 +1,5 @@
-import {expect, test} from "../ui/fixtures/auth.fixture";
-import {HelpPage} from "../ui/pages/HelpPage";
+import {expect, test} from "../../ui/fixtures/auth.fixture";
+import {HelpPage} from "../../ui/pages/HelpPage";
 
 test.describe('Main page redirect test', () => {
     test('should redirect from main page to "Find out more"', async ({mainPage, page, context}) => {
