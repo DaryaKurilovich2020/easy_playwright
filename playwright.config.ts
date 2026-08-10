@@ -1,4 +1,5 @@
-import { defineConfig, devices } from '@playwright/test';
+import "dotenv/config";
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   expect: {
@@ -6,7 +7,7 @@ export default defineConfig({
   },
 
   timeout: 240000,
-  testDir: './tests',
+  testDir: "./tests",
 
   fullyParallel: false,
 
@@ -16,19 +17,21 @@ export default defineConfig({
 
   workers: process.env.CI ? 1 : 1,
 
-  reporter: 'html',
+  reporter: "html",
 
   use: {
-    baseURL: 'https://cs2.easyrpa.eu/',
-    trace: 'on',
+    baseURL: "https://cs2.easyrpa.eu/",
+    trace: "on",
     navigationTimeout: 300000,
     actionTimeout: 300000,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure'
   },
 
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
 });
