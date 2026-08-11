@@ -1,32 +1,34 @@
-import { test as base, expect, APIRequestContext } from '@playwright/test';
-import { AuthController } from '../controllers/AuthController';
-import { NodeController } from '../controllers/NodeController';
+import { test as base, expect, APIRequestContext } from "@playwright/test";
+import { AuthController } from "../controllers/AuthController";
+import { NodeController } from "../controllers/NodeController";
 
 type ApiFixtures = {
-    authorizedRequest: APIRequestContext;
-    nodeController: NodeController;
+  authorizedRequest: APIRequestContext;
+  nodeController: NodeController;
 };
 
 export const apiTest = base.extend<ApiFixtures>({
+  authorizedRequest: async (
+    { request, playwright }: { request: APIRequestContext; playwright: any },
+    use,
+  ) => {
+    const authController = new AuthController(request);
+    const token = await authController.login();
 
-    authorizedRequest: async ({ request, playwright }: { request: APIRequestContext, playwright: any }, use) => {
-        const authController = new AuthController(request);
-        const token = await authController.login();
+    const authContext = await playwright.request.newContext({
+      extraHTTPHeaders: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
 
-        const authContext = await playwright.request.newContext({
-            extraHTTPHeaders: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json',
-            }
-        });
+    await use(authContext);
+    await authContext.dispose();
+  },
 
-        await use(authContext);
-        await authContext.dispose();
-    },
-
-    nodeController: async ({ authorizedRequest }, use) => {
-        await use(new NodeController(authorizedRequest));
-    },
+  nodeController: async ({ authorizedRequest }, use) => {
+    await use(new NodeController(authorizedRequest));
+  },
 });
 
 export { expect };
