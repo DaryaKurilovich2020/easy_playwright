@@ -1,13 +1,20 @@
-import {Page} from "@playwright/test";
-import {BasePage} from "./BasePage";
+import { Page } from "@playwright/test";
+import { BasePage } from "./BasePage";
+import { NavigationBar } from "../components/NavigationBar";
 
-export class MainPage extends BasePage{
-    readonly page: Page;
-    constructor(page:Page) {
-        super(page);
-        this.page = page;
-    }
-    async redirectToFindOutMore() {
-        await this.page.getByRole("link", {name: "Find out more"}).click();
-    }
+export class MainPage extends BasePage {
+  private readonly navigationBar: NavigationBar;
+
+  constructor(page: Page) {
+    super(page);
+    this.navigationBar = new NavigationBar(page.locator("#sidebar_list"));
+  }
+
+  async redirectToFindOutMore() {
+    await this.getLinkByName("Find out more").click();
+  }
+
+  async navigateTo(module: string) {
+    await this.navigationBar.navigateTo(module);
+  }
 }

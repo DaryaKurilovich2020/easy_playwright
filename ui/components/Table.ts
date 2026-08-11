@@ -1,22 +1,23 @@
-import {Page, Locator} from '@playwright/test';
-import {TableRow} from './TableRow';
+import { Page, Locator } from "@playwright/test";
+import { TableRow } from "./TableRow";
+import { BaseComponent } from "./BaseComponent";
 
+export class Table extends BaseComponent {
+  private readonly rows: Locator;
+  private readonly headers: Locator;
 
-export class Table {
-    readonly root: Locator;
-    private readonly rows: Locator;
-    private readonly headers: Locator;
+  constructor(root: Locator) {
+    super(root);
+    this.headers = this.root.locator(
+      ".MuiTable-stickyHeader thead th, .MuiTable-stickyHeader thead td",
+    );
+    this.rows = this.root.locator("tbody").locator("tr");
+  }
 
-    constructor(root: Locator) {
-        this.root = root;
-        this.headers = this.root.locator('.MuiTable-stickyHeader thead th, .MuiTable-stickyHeader thead td');
-        this.rows = this.root.locator('tbody').locator('tr');
-    }
+  getRowByColumnValue(columnName: string, cellValue: string): TableRow {
+    const matchedRow = this.rows.filter({ hasText: cellValue });
 
-    getRowByColumnValue(columnName: string, cellValue: string): TableRow {
-        const matchedRow = this.rows.filter({ hasText: cellValue });
-
-        return new TableRow(matchedRow);
-        //TODO сделать поиск с учетом имени колонки
-    }
+    return new TableRow(matchedRow);
+    //TODO сделать поиск с учетом имени колонки
+  }
 }
