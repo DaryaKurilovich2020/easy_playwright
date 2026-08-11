@@ -5,9 +5,11 @@ import { NodeDataFactory } from "../../test-data/api/node.testdata";
 apiTest.describe("API: Isolated Node CRUD Operations", () => {
   let activeNodeId: number;
   let nodeName = "Pre-created Autotest Node";
+  let description = "Automated test node description";
+  let workingDirectory = "/opt/nodes/workdir";
 
   apiTest.beforeEach(async ({ nodeController }) => {
-    const payload = NodeDataFactory.createValidNodePayload(nodeName);
+    const payload = NodeDataFactory.createValidNodePayload(nodeName, description, workingDirectory);
     const res = await nodeController.createNode(payload);
 
     const body = await res.json();
@@ -22,7 +24,7 @@ apiTest.describe("API: Isolated Node CRUD Operations", () => {
 
   apiTest("should CREATE a new node @smoke", async ({ nodeController }) => {
     const payload = NodeDataFactory.createValidNodePayload(
-      "Brand New Isolated Node",
+      "Brand New Isolated Node", description, workingDirectory
     );
 
     const response = await nodeController.createNode(payload);
@@ -60,7 +62,7 @@ apiTest.describe("API: Isolated Node CRUD Operations", () => {
   apiTest(
     "should UPDATE node fields successfully @smoke",
     async ({ nodeController }) => {
-      const updatedPayload = NodeDataFactory.updateNodePayload(nodeName);
+      const updatedPayload = NodeDataFactory.updateNodePayload(nodeName, description, workingDirectory);
 
       const response = await nodeController.updateNode(
         activeNodeId,
