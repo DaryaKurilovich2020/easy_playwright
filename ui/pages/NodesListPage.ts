@@ -67,4 +67,17 @@ export class NodesListPage extends BasePage {
     await this.openRecordByName(recordName);
     await this.nodePage.updateRecord(recordName, recordData);
   }
+
+  async clickCreateNewRecord() {
+   await this.clickButton("Create New");
+    // await this.createNewButton.click({ force: true });
+  }
+
+  async deleteRecords() {
+    await this.page.getByRole("button", { name: "Delete" }).click();
+  }
+
+  async searchByText(text: string) {
+    await this.page.locator("input#search_field").fill(text);
+  }
 }

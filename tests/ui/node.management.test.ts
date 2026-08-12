@@ -1,4 +1,4 @@
-import { test, expect } from "../../ui/fixtures/nodemanagement.fixture";
+import { test, expect } from "../../fixtures/nodemanagement.fixture";
 import {
   NODE_MANAGEMENT_DATA,
   UPDATED_NODE_MANAGEMENT_DATA,
@@ -74,17 +74,15 @@ test.describe("Node Management Tests", () => {
       createdNode,
       page,
     }) => {
-      const nodePage = createdNode.page;
+      const nodeListPage = createdNode.page;
       const nodeName = createdNode.nodeName;
 
-      await nodePage.searchByText(nodeName);
-      await nodePage.openRecordByName(nodeName);
-      await nodePage.searchByText(nodeName);
-      await nodePage.openRecordByName(nodeName);
+      await nodeListPage.searchByText(nodeName);
+      await nodeListPage.openRecordByName(nodeName);
       await expect
         .soft(page.getByRole("button", { name: "Update" }))
         .toBeDisabled();
-
+      const nodePage = new NodePage(page);
       await nodePage.goBackToList();
     });
   });

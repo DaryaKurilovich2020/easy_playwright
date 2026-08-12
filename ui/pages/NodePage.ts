@@ -29,4 +29,11 @@ export class NodePage extends BasePage {
   async getNodeParamsValues(params: string[]) {
     return this.nodePanel.getFormDataAsArray(params);
   }
+
+  async goBackToList() {
+    await this.page.waitForLoadState("networkidle");
+    const backToListButton = this.getByText("Back to List");
+    await backToListButton.waitFor({ state: "visible", timeout: 160000 });
+    await backToListButton.click();
+  }
 }
