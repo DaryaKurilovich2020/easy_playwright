@@ -1,10 +1,14 @@
 import { test as base, expect, APIRequestContext } from "@playwright/test";
-import { AuthController } from "../controllers/AuthController";
-import { NodeController } from "../controllers/NodeController";
+import { AuthController } from "../api/controllers/AuthController";
+import { NodeController } from "../api/controllers/NodeController";
+import {UserController} from "../api/controllers/UserController";
+import {AutomationProcessController} from "../api/controllers/AutomationProcessController";
 
 type ApiFixtures = {
   authorizedRequest: APIRequestContext;
   nodeController: NodeController;
+  userController: UserController;
+  automationProcessController: AutomationProcessController;
 };
 
 export const apiTest = base.extend<ApiFixtures>({
@@ -28,6 +32,14 @@ export const apiTest = base.extend<ApiFixtures>({
 
   nodeController: async ({ authorizedRequest }, use) => {
     await use(new NodeController(authorizedRequest));
+  },
+
+  userController: async ({ authorizedRequest }, use) => {
+    await use(new UserController(authorizedRequest));
+  },
+
+  automationProcessController: async ({ authorizedRequest }, use) => {
+    await use(new AutomationProcessController(authorizedRequest));
   },
 });
 
