@@ -1,0 +1,51 @@
+name: Full Regression Tests
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  run-regression:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+
+      - name: Check code formatting
+        run: npm run format:check
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run All Tests
+        run: npx playwright test
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          GRANT_TYPE: ${{ secrets.GRANT_TYPE }}
+          SCOPE: ${{ secrets.SCOPE }}
+
+      - name: Upload Regression Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-regression-report
+          path: playwright-report/
+          retention-days: 14

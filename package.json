@@ -1,13 +1,31 @@
 {
-  "name": "${PROJECT_NAME}",
+  "name": "easy_playwright",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "npx playwright test",
+    "test:ui": "playwright test tests/ui",
+    "test:api": "playwright test tests/api",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report",
+    "lint": "eslint .",
+    "format": "prettier --write . --ignore-path .gitignore",
+    "format:check": "prettier --check . --ignore-path .gitignore"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-playwright": "^2.11.0",
+    "prettier": "^3.9.6",
     "typescript": "^5.5.3"
   },
   "private": true

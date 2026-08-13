@@ -1,0 +1,42 @@
+import { Download, expect, Page } from "@playwright/test";
+import { NodePanel } from "../components/NodePanel";
+import { NodePage } from "./NodePage";
+import {BaseListPage} from "./BaseListPage";
+
+export class NodesListPage extends BaseListPage {
+  private readonly nodePage: NodePage;
+
+  constructor(page: Page) {
+    super(page);
+    this.nodePage = new NodePage(this.page);
+  }
+
+  async downloadAgentPackage(nodeName: string): Promise<Download> {
+    await this.searchByText(nodeName);
+    await this.table.getRowByColumnValue("Name", nodeName)
+      .clickButton("Download node agent package");
+    const downloadLink = this.getLinkByName(
+      "Export complete. Click to download",
+    );
+    await expect(downloadLink).toBeVisible();
+    const downloadPromise = this.page.waitForEvent("download");
+    await downloadLink.click();
+
+    return await downloadPromise;
+  }
+
+  async createRecord(recordData: Record<string, string>) {
+    await this.clickCreateNewRecord();
+    const newNodeManagementPanel = new NodePanel(
+      this.page.locator("#details_panel"),
+    );
+    await newNodeManagementPanel.fillForm(recordData);
+    await newNodeManagementPanel.clickNodeButton("Create");
+  }
+
+  async updateRecord(recordName: string, recordData: Record<string, string>) {
+    await this.searchByText(recordName);
+    await this.openRecordByName(recordName);
+    await this.nodePage.updateRecord(recordName, recordData);
+  }
+}
