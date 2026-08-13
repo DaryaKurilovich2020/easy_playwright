@@ -1,92 +1,130 @@
-import { apiTest, expect } from "../../api/fixtures/api.fixture";
+import {apiTest, expect} from "../../fixtures/api.fixture";
 
-import { NodeDataFactory } from "../../test-data/api/node.testdata";
+import {NodeDataFactory} from "../../test-data/api/node.testdata";
 
 apiTest.describe("API: Isolated Node CRUD Operations", () => {
-  let activeNodeId: number;
-  let nodeName = "Pre-created Autotest Node";
-  let description = "Automated test node description";
-  let workingDirectory = "/opt/nodes/workdir";
+    let activeNodeId: number;
+    let nodeName = "Pre-created Autotest Node";
+    let description = "Automated test node description";
+    let workingDirectory = "/opt/nodes/workdir";
 
-  apiTest.beforeEach(async ({ nodeController }) => {
-    const payload = NodeDataFactory.createValidNodePayload(nodeName, description, workingDirectory);
-    const res = await nodeController.createNode(payload);
+    apiTest.beforeEach(async ({nodeController}) => {
+        const payload = NodeDataFactory.createValidNodePayload(nodeName, description, workingDirectory);
+        const res = await nodeController.createNode(payload);
 
-    const body = await res.json();
-    activeNodeId = Number(body.id);
-  });
+        const body = await res.json();
+        activeNodeId = Number(body.id);
+    });
 
-  apiTest.afterEach(async ({ nodeController }) => {
-    if (activeNodeId) {
-      await nodeController.deleteNode(activeNodeId);
-    }
-  });
+    apiTest.afterEach(async ({nodeController}) => {
+        if (activeNodeId) {
+            await nodeController.deleteNode(activeNodeId);
+        }
+    });
 
-  apiTest("should CREATE a new node @smoke", async ({ nodeController }) => {
-    const payload = NodeDataFactory.createValidNodePayload(
-      "Brand New Isolated Node", description, workingDirectory
+    apiTest("should CREATE a new node @smoke", async ({nodeController}) => {
+        const payload = NodeDataFactory.createValidNodePayload(
+            "Brand New Isolated Node", description, workingDirectory
+        );
+
+        const response = await nodeController.createNode(payload);
+        expect(response.status()).toBe(200);
+
+        const body = await response.json();
+        expect(body).toHaveProperty("id");
+        expect(body.name).toBe(payload.name);
+        await nodeController.deleteNode(Number(body.id));
+    });
+
+    apiTest("should READ node details by ID @smoke", async ({nodeController}) => {
+        const response = await nodeController.getNode(activeNodeId);
+        expect(response.status()).toBe(200);
+
+        const body = await response.json();
+        expect(body.id).toBe(activeNodeId);
+        expect(body.name).toBe(nodeName);
+    });
+
+    apiTest("should download node details by ID", async ({nodeController}) => {
+        const response = await nodeController.downloadNode(activeNodeId);
+        expect(response.status()).toBe(200);
+
+        const contentType = response.headers()["content-type"];
+        expect(contentType).toContain("text/csv");
+
+        const fileBuffer = await response.body();
+        expect(fileBuffer.length).toBeGreaterThan(0);
+
+        const csvText = fileBuffer.toString("utf-8");
+        expect(csvText).toContain("key,value");
+    });
+
+    apiTest(
+        "should UPDATE node fields successfully @smoke",
+        async ({nodeController}) => {
+            const updatedPayload = NodeDataFactory.updateNodePayload(nodeName, description, workingDirectory);
+
+            const response = await nodeController.updateNode(
+                activeNodeId,
+                updatedPayload,
+            );
+            expect(response.status()).toBe(200);
+
+            const body = await response.json();
+            expect(body.description).toBe(updatedPayload.description);
+            expect(body.workDir).toBe(updatedPayload.workDir);
+        },
     );
 
-    const response = await nodeController.createNode(payload);
-    expect(response.status()).toBe(200);
+    apiTest(
+        "should DELETE the node and return 403 on next read @smoke",
+        async ({nodeController}) => {
+            const response = await nodeController.deleteNode(activeNodeId);
+            expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(body).toHaveProperty("id");
-    expect(body.name).toBe(payload.name);
-    await nodeController.deleteNode(Number(body.id));
-  });
+            const deletedId = activeNodeId;
+            activeNodeId = 0;
 
-  apiTest("should READ node details by ID @smoke", async ({ nodeController }) => {
-    const response = await nodeController.getNode(activeNodeId);
-    expect(response.status()).toBe(200);
+            const verifyResponse = await nodeController.getNode(deletedId);
+            expect(verifyResponse.status()).toBe(403);
+        },
+    );
 
-    const body = await response.json();
-    expect(body.id).toBe(activeNodeId);
-    expect(body.name).toBe(nodeName);
-  });
+    apiTest(
+        "should return empty full logs for a newly created node by Id",
+        async ({nodeController}) => {
+            const response = await nodeController.getNodeFullLogs(activeNodeId);
+            expect(response.status()).toBe(200);
 
-  apiTest("should download node details by ID", async ({ nodeController }) => {
-    const response = await nodeController.downloadNode(activeNodeId);
-    expect(response.status()).toBe(200);
+            const textBody = (await response.text()).trim();
+            expect(textBody).toHaveLength(0);
+        }
+    );
 
-    const contentType = response.headers()["content-type"];
-    expect(contentType).toContain("text/csv");
+    apiTest(
+        "should return features list for a node by Id",
+        async ({nodeController}) => {
+            const response = await nodeController.getNodeFeatures(activeNodeId);
+            expect(response.status()).toBe(200);
 
-    const fileBuffer = await response.body();
-    expect(fileBuffer.length).toBeGreaterThan(0);
+            const body = await response.json();
 
-    const csvText = fileBuffer.toString("utf-8");
-    expect(csvText).toContain("key,value");
-  });
+            expect(Array.isArray(body)).toBe(true);
+            expect(body.length).toBeGreaterThan(0);
 
-  apiTest(
-    "should UPDATE node fields successfully @smoke",
-    async ({ nodeController }) => {
-      const updatedPayload = NodeDataFactory.updateNodePayload(nodeName, description, workingDirectory);
+            const firstFeature = body[0];
 
-      const response = await nodeController.updateNode(
-        activeNodeId,
-        updatedPayload,
-      );
-      expect(response.status()).toBe(200);
+            expect(firstFeature).toHaveProperty('id');
+            expect(typeof firstFeature.id).toBe('number');
 
-      const body = await response.json();
-      expect(body.description).toBe(updatedPayload.description);
-      expect(body.workDir).toBe(updatedPayload.workDir);
-    },
-  );
+            expect(firstFeature).toHaveProperty('type');
+            expect(typeof firstFeature.type).toBe('string');
 
-  apiTest(
-    "should DELETE the node and return 403 on next read @smoke",
-    async ({ nodeController }) => {
-      const response = await nodeController.deleteNode(activeNodeId);
-      expect(response.status()).toBe(200);
+            expect(firstFeature).toHaveProperty('enabled');
+            expect(typeof firstFeature.enabled).toBe('boolean');
 
-      const deletedId = activeNodeId;
-      activeNodeId = 0;
-
-      const verifyResponse = await nodeController.getNode(deletedId);
-      expect(verifyResponse.status()).toBe(403);
-    },
-  );
+            expect(firstFeature).toHaveProperty('uuid');
+            expect(typeof firstFeature.uuid).toBe('string');
+        }
+    );
 });
