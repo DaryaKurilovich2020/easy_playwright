@@ -1,4 +1,4 @@
-import { test, expect } from "../../ui/fixtures/auth.fixture";
+import { test, expect } from "../../fixtures/auth.fixture";
 import {
   INVALID_LOGIN_DATA,
   VALID_LOGIN_DATA,

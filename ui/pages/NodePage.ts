@@ -2,9 +2,11 @@ import { BasePage } from "./BasePage";
 import { Page } from "@playwright/test";
 import { NodePanel } from "../components/NodePanel";
 import { ConfirmationModal } from "../components/ConfirmationModal";
+import {NotificationComponent} from "../components/NotificationComponent";
 
 export class NodePage extends BasePage {
   private readonly nodePanel: NodePanel;
+  private readonly notification: NotificationComponent;
   private readonly confirmationModal: ConfirmationModal;
   constructor(page: Page) {
     super(page);
@@ -12,6 +14,7 @@ export class NodePage extends BasePage {
     this.confirmationModal = new ConfirmationModal(
       this.page.getByRole("dialog"),
     );
+    this.notification = new NotificationComponent(this.page.getByRole('alert'));
   }
 
   async updateRecord(recordName: string, recordData: Record<string, string>) {
@@ -21,11 +24,7 @@ export class NodePage extends BasePage {
     await this.confirmationModal.clickButton("Update");
     await this.goBackToList();
   }
-  //
-  // async fillRecordData(recordName: string, recordData: Record<string, string>) {
-  //     await this.nodePanel.fillForm(recordData);
-  // }
-  //
+
   async getNodeParamsValues(params: string[]) {
     return this.nodePanel.getFormDataAsArray(params);
   }
@@ -35,5 +34,9 @@ export class NodePage extends BasePage {
     const backToListButton = this.getByText("Back to List");
     await backToListButton.waitFor({ state: "visible", timeout: 160000 });
     await backToListButton.click();
+  }
+
+  async getNotification() {
+    return this.notification
   }
 }

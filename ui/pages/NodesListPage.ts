@@ -1,28 +1,19 @@
-import { BasePage } from "./BasePage";
 import { Download, expect, Page } from "@playwright/test";
 import { NodePanel } from "../components/NodePanel";
-import { ConfirmationModal } from "../components/ConfirmationModal";
-import { Table } from "../components/Table";
 import { NodePage } from "./NodePage";
+import {BaseListPage} from "./BaseListPage";
 
-export class NodesListPage extends BasePage {
-  private readonly table: Table;
-  private readonly confirmationModal: ConfirmationModal;
+export class NodesListPage extends BaseListPage {
   private readonly nodePage: NodePage;
 
   constructor(page: Page) {
     super(page);
-    this.table = new Table(page.locator(".MuiTable-stickyHeader"));
-    this.confirmationModal = new ConfirmationModal(
-      this.page.getByRole("dialog"),
-    );
     this.nodePage = new NodePage(this.page);
   }
 
   async downloadAgentPackage(nodeName: string): Promise<Download> {
     await this.searchByText(nodeName);
-    await this.table
-      .getRowByColumnValue("Name", nodeName)
+    await this.table.getRowByColumnValue("Name", nodeName)
       .clickButton("Download node agent package");
     const downloadLink = this.getLinkByName(
       "Export complete. Click to download",
@@ -32,25 +23,6 @@ export class NodesListPage extends BasePage {
     await downloadLink.click();
 
     return await downloadPromise;
-  }
-
-  async deleteRecordViaCheckbox(recordName: string): Promise<void> {
-    await this.searchByText(recordName);
-    await this.table.getRowByColumnValue("Name", recordName).select();
-    await this.deleteRecords();
-    await this.confirmationModal.clickButton("Delete");
-  }
-
-  async deleteRecordInline(recordName: string): Promise<void> {
-    await this.searchByText(recordName);
-    await this.table
-      .getRowByColumnValue("Name", recordName)
-      .clickButton("Delete");
-    await this.confirmationModal.clickButton("Delete");
-  }
-
-  async openRecordByName(recordName: string) {
-    await this.page.getByRole("link", { name: recordName }).click();
   }
 
   async createRecord(recordData: Record<string, string>) {
@@ -66,18 +38,5 @@ export class NodesListPage extends BasePage {
     await this.searchByText(recordName);
     await this.openRecordByName(recordName);
     await this.nodePage.updateRecord(recordName, recordData);
-  }
-
-  async clickCreateNewRecord() {
-   await this.clickButton("Create New");
-    // await this.createNewButton.click({ force: true });
-  }
-
-  async deleteRecords() {
-    await this.page.getByRole("button", { name: "Delete" }).click();
-  }
-
-  async searchByText(text: string) {
-    await this.page.locator("input#search_field").fill(text);
   }
 }

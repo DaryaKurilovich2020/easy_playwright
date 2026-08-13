@@ -1,7 +1,7 @@
 import { test as base } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage";
-import { VALID_LOGIN_DATA } from "../../test-data/ui/login.testdata";
-import { MainPage } from "../pages/MainPage";
+import { LoginPage } from "../ui/pages/LoginPage";
+import { VALID_LOGIN_DATA } from "../test-data/ui/login.testdata";
+import { MainPage } from "../ui/pages/MainPage";
 
 type AuthFixture = {
   loginPage: LoginPage;

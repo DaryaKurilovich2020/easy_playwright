@@ -42,12 +42,8 @@ test.describe("Node Management Tests", () => {
         };
 
         await nodesListPage.createRecord(duplicateData);
-        //TODO Добавить работу с компонентом notification
-        await expect(
-          page.getByText(
-            "Node with the same name already exists! Please, choose another name",
-          ),
-        ).toBeVisible();
+        const snackbar = page.getByRole('alert').filter({ hasText: 'Node with the same name already exists! Please, choose another name' });
+        await expect(snackbar).toBeVisible();
       });
     });
   });
@@ -97,12 +93,8 @@ test.describe("Node Management Tests", () => {
 
       await nodePage.deleteRecordInline(nodeName);
 
-      await expect(page.getByText("No Results Found")).toBeVisible({
-        timeout: 15000,
-      });
-      await expect(page.getByText(nodeName)).not.toBeVisible({
-        timeout: 15000,
-      });
+      await expect(page.getByText("No Results Found")).toBeVisible();
+      await expect(page.getByText(nodeName)).not.toBeVisible();
     });
 
     test("should delete existing node by selecting the record in the table", async ({
@@ -114,12 +106,8 @@ test.describe("Node Management Tests", () => {
 
       await nodePage.deleteRecordViaCheckbox(nodeName);
 
-      await expect(page.getByText("No Results Found")).toBeVisible({
-        timeout: 15000,
-      });
-      await expect(page.getByText(nodeName)).not.toBeVisible({
-        timeout: 15000,
-      });
+      await expect(page.getByText("No Results Found")).toBeVisible();
+      await expect(page.getByText(nodeName)).not.toBeVisible();
     });
   });
 

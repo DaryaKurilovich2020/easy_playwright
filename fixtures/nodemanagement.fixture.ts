@@ -1,7 +1,6 @@
 import { test as base } from "@playwright/test";
 import { LoginPage } from "../ui/pages/LoginPage";
 import { VALID_LOGIN_DATA } from "../test-data/ui/login.testdata";
-import { NodePanel } from "../ui/components/NodePanel";
 import { NODE_MANAGEMENT_DATA } from "../test-data/ui/nodemanagement.testdata";
 import { NodesListPage } from "../ui/pages/NodesListPage";
 import { MainPage } from "../ui/pages/MainPage";
@@ -46,17 +45,6 @@ export const test = base.extend<NodeManagementFixture>({
     await nodeController.createNode(payload);
 
     await nodesListPage.openRecordByName(validNode.Name);
-    // await nodesListPage.clickCreateNewRecord();
-    // const newNodeManagementPanel = new NodePanel(
-    //   page.locator("#details_panel"),
-    // );
-    // const rawData = NODE_MANAGEMENT_DATA;
-    // const nodeName = rawData.Name;
-    // const nodeData = Object.entries(rawData);
-    // for (const [param, value] of nodeData) {
-    //   await newNodeManagementPanel.details.setParameter(param, value);
-    // }
-    // await newNodeManagementPanel.clickNodeButton("Create");
     const nodePage = new NodePage(page);
 
     await nodePage.goBackToList();
