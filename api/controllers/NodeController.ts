@@ -26,4 +26,12 @@ export class NodeController {
   async downloadNode(id: number) {
     return await this.request.get(`/api/v1/node/${id}/params/download`);
   }
+
+  async getNodeFullLogs(id: number) {
+    return await this.request.get(`/api/v1/node/${id}/logs/full`);
+  }
+
+  async getNodeFeatures(id: number) {
+    return await this.request.get(`/api/v1/node/${id}/feature`);
+  }
 }
