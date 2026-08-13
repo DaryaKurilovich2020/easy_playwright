@@ -1,4 +1,4 @@
-import {getNodeUniqueName} from "../../ui/helpers/utils";
+import {getNodeUniqueName} from "../../helpers/utils";
 
 export const UI_AUTOMATION_PROCESS_MANAGEMENT_DATA = {
     "Name": getNodeUniqueName("Automation_Process"),
