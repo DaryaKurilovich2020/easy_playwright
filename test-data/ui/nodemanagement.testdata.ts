@@ -1,4 +1,4 @@
-import { getNodeUniqueName } from "../../ui/helpers/utils";
+import { getNodeUniqueName } from "../../helpers/utils";
 
 export const NODE_MANAGEMENT_DATA = {
   Name: getNodeUniqueName("Node"),
