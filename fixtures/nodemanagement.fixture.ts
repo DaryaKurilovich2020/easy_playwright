@@ -11,6 +11,7 @@ import {NodePage} from "../ui/pages/NodePage";
 
 type NodeManagementFixture = {
   nodesListPage: NodesListPage;
+  nodePage: NodePage;
   createdNode: {
     page: NodesListPage;
     nodeName: string;
@@ -25,6 +26,11 @@ export const test = base.extend<NodeManagementFixture>({
     const mainPage = new MainPage(page);
     await mainPage.navigateTo("Node Management");
     const nodePage = new NodesListPage(page);
+    await use(nodePage);
+  },
+
+  nodePage: async ({ page }, use) => {
+    const nodePage = new NodePage(page);
     await use(nodePage);
   },
 

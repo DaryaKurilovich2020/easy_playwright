@@ -3,7 +3,6 @@ import {
   NODE_MANAGEMENT_DATA,
   UPDATED_NODE_MANAGEMENT_DATA,
 } from "../../test-data/ui/nodemanagement.testdata";
-import { NodePage } from "../../ui/pages/NodePage";
 
 test.describe("Node Management Tests", () => {
   let nodeNameToDelete: string | null = null;
@@ -20,10 +19,9 @@ test.describe("Node Management Tests", () => {
 
   test.describe("Create Node tests", () => {
     test.describe("Positive tests", () => {
-      test("should create new node @smoke", async ({ nodesListPage, page }) => {
+      test("should create new node @smoke", async ({ nodesListPage, page, nodePage }) => {
         const nodeData: Record<string, string> = NODE_MANAGEMENT_DATA;
         await nodesListPage.createRecord(nodeData);
-        const nodePage = new NodePage(page);
         const actualNodeData = await nodePage.getNodeParamsValues(
           Object.keys(NODE_MANAGEMENT_DATA),
         );
@@ -49,7 +47,7 @@ test.describe("Node Management Tests", () => {
   });
 
   test.describe("Update Node tests", () => {
-    test("should update existing node", async ({ createdNode, page }) => {
+    test("should update existing node", async ({ createdNode, page, nodePage }) => {
       const nodesListPage = createdNode.page;
       const nodeName = createdNode.nodeName;
       const nodeData = UPDATED_NODE_MANAGEMENT_DATA;
@@ -57,7 +55,6 @@ test.describe("Node Management Tests", () => {
       await nodesListPage.updateRecord(nodeName, nodeData);
       await nodesListPage.openRecordByName(nodeName);
 
-      const nodePage = new NodePage(page);
       const actualNodeData = await nodePage.getNodeParamsValues(
         Object.keys(UPDATED_NODE_MANAGEMENT_DATA),
       );
@@ -67,8 +64,7 @@ test.describe("Node Management Tests", () => {
     });
 
     test("should not let update existing node if no changes made", async ({
-      createdNode,
-      page,
+      createdNode, page, nodePage
     }) => {
       const nodeListPage = createdNode.page;
       const nodeName = createdNode.nodeName;
@@ -78,7 +74,6 @@ test.describe("Node Management Tests", () => {
       await expect
         .soft(page.getByRole("button", { name: "Update" }))
         .toBeDisabled();
-      const nodePage = new NodePage(page);
       await nodePage.goBackToList();
     });
   });
