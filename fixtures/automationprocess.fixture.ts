@@ -6,9 +6,11 @@ import {MainPage} from "../ui/pages/MainPage";
 import {AuthController} from "../api/controllers/AuthController";
 import {AutomationProcessController} from "../api/controllers/AutomationProcessController";
 import {AUTOMATION_PROCESS_DATA} from "../test-data/api/automation.process.testdata";
+import {AutomationProcessPage} from "../ui/pages/AutomationProcessPage";
 
 type AutomationProcessData = {
     automationProcessListPage: AutomationProcessesListPage;
+    automationProcessPage: AutomationProcessPage;
     createdAutomationProcess: {
         page: AutomationProcessesListPage;
         automationProcessName: string;
@@ -24,6 +26,11 @@ export const test = base.extend<AutomationProcessData>({
         await mainPage.navigateTo("Automation Processes");
         const automationProcessListPage = new AutomationProcessesListPage(page);
         await use(automationProcessListPage);
+    },
+
+    automationProcessPage: async ({ page }, use) => {
+        const automationProcessPage = new AutomationProcessPage(page);
+        await use(automationProcessPage);
     },
 
     createdAutomationProcess: async ({ page, automationProcessListPage, request, playwright }, use) => {
