@@ -37,8 +37,8 @@ test.describe("Automation Process Management Tests", () => {
                 };
 
                 await automationProcessListPage.createRecord(duplicateData);
-                const snackbar = page.getByRole('alert').filter({hasText: 'Node with the same name already exists! Please, choose another name'});
-                await expect(snackbar).toBeVisible();
+                await expect(automationProcessListPage.getNotification()).toBeVisible();
+                await expect(automationProcessListPage.getNotification()).toHaveText('Automation Process with the same name already exists! Please, choose another name');
             });
         });
     });
