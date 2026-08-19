@@ -4,13 +4,9 @@ import { BaseComponent } from "./BaseComponent";
 
 export class Table extends BaseComponent {
   private readonly rows: Locator;
-  private readonly headers: Locator;
 
   constructor(root: Locator) {
     super(root);
-    this.headers = this.root.locator(
-      ".MuiTable-stickyHeader thead th, .MuiTable-stickyHeader thead td",
-    );
     this.rows = this.root.locator("tbody").locator("tr");
   }
 
