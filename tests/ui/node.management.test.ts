@@ -40,8 +40,9 @@ test.describe("Node Management Tests", () => {
         };
 
         await nodesListPage.createRecord(duplicateData);
-        const snackbar = page.getByRole('alert').filter({ hasText: 'Node with the same name already exists! Please, choose another name' });
-        await expect(snackbar).toBeVisible();
+
+        await expect(nodesListPage.getNotification()).toBeVisible();
+        await expect(nodesListPage.getNotification()).toHaveText('Node with the same name already exists! Please, choose another name');
       });
     });
   });
