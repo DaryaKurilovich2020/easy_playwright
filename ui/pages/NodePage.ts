@@ -1,17 +1,17 @@
 import {BasePage} from "./BasePage";
 import {Page} from "@playwright/test";
-import {NodePanel} from "../components/NodePanel";
+import {ParamsPanel} from "../components/ParamsPanel";
 import {ConfirmationModal} from "../components/ConfirmationModal";
 import {NotificationComponent} from "../components/NotificationComponent";
 
 export class NodePage extends BasePage {
-    private readonly nodePanel: NodePanel;
+    private readonly nodePanel: ParamsPanel;
     private readonly notification: NotificationComponent;
     private readonly confirmationModal: ConfirmationModal;
 
     constructor(page: Page) {
         super(page);
-        this.nodePanel = new NodePanel(this.page.locator("#root"));
+        this.nodePanel = new ParamsPanel(this.page.locator("#root"));
         this.confirmationModal = new ConfirmationModal(
             this.page.getByRole("dialog"),
         );
@@ -35,9 +35,5 @@ export class NodePage extends BasePage {
         const backToListButton = this.getByText("Back to List");
         await backToListButton.waitFor({state: "visible", timeout: 160000});
         await backToListButton.click();
-    }
-
-    getNotification() {
-        return this.notification.getComponent();
     }
 }

@@ -1,5 +1,4 @@
 import {BasePage} from "./BasePage";
-import {NodePanel} from "../components/NodePanel";
 import {Table} from "../components/Table";
 import {ConfirmationModal} from "../components/ConfirmationModal";
 import {Page} from "@playwright/test";

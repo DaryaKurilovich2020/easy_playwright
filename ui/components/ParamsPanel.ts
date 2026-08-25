@@ -2,7 +2,7 @@ import { Locator } from "@playwright/test";
 import { DetailsComponent } from "./DetailsComponent";
 import { BaseComponent } from "./BaseComponent";
 
-export class NodePanel extends BaseComponent {
+export class ParamsPanel extends BaseComponent {
   readonly details: DetailsComponent;
 
   constructor(root: Locator) {

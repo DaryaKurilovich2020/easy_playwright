@@ -11,6 +11,6 @@ export class DetailsComponent extends BaseComponent {
   }
 
     async setParameter(name: string, value: string) {
-        await this.getInput(name).fill(value);
+        await this.root.getByLabel(name, { exact: false }).fill(value);
     }
 }

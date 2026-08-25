@@ -1,12 +1,12 @@
 import {BasePage} from "./BasePage";
 import {Page} from "@playwright/test";
-import {NodePanel} from "../components/NodePanel";
+import {ParamsPanel} from "../components/ParamsPanel";
 
 export class AutomationProcessPage extends BasePage{
-    private readonly nodePanel: NodePanel;
+    private readonly nodePanel: ParamsPanel;
     constructor(page: Page) {
         super(page);
-        this.nodePanel = new NodePanel(this.page.locator("#root"));
+        this.nodePanel = new ParamsPanel(this.page.locator("#root"));
     }
 
     async goBackToList() {
@@ -19,5 +19,4 @@ export class AutomationProcessPage extends BasePage{
     async getNodeParamsValues(params: string[]) {
         return this.nodePanel.getFormDataAsArray(params);
     }
-
 }

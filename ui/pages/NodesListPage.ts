@@ -1,5 +1,5 @@
 import {Download, expect, Page} from "@playwright/test";
-import {NodePanel} from "../components/NodePanel";
+import {ParamsPanel} from "../components/ParamsPanel";
 import {NodePage} from "./NodePage";
 import {BaseListPage} from "./BaseListPage";
 import {NotificationComponent} from "../components/NotificationComponent";
@@ -30,7 +30,7 @@ export class NodesListPage extends BaseListPage {
 
     async createRecord(recordData: Record<string, string>) {
         await this.clickCreateNewRecord();
-        const newNodeManagementPanel = new NodePanel(
+        const newNodeManagementPanel = new ParamsPanel(
             this.page.locator("#details_panel"),
         );
         await newNodeManagementPanel.fillForm(recordData);

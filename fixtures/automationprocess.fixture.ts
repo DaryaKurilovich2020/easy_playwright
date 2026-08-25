@@ -46,12 +46,15 @@ export const test = base.extend<AutomationProcessData>({
 
         const automationProcessController = new AutomationProcessController(authContext);
         const automationProcessData = AUTOMATION_PROCESS_DATA;
-        await automationProcessController.createAutomationProcess(automationProcessData);
-
+        let response = await automationProcessController.createAutomationProcess(automationProcessData);
+        const body = await response.json();
+        const processId = Number(body.id);
         await use({
             page: automationProcessListPage,
             automationProcessName: automationProcessData.name,
         });
+
+        await automationProcessController.deleteAutomationProcess(processId);
     },
 });
 

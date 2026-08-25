@@ -1,6 +1,6 @@
 import {BaseListPage} from "./BaseListPage";
 import {Page} from "@playwright/test";
-import {NodePanel} from "../components/NodePanel";
+import {ParamsPanel} from "../components/ParamsPanel";
 import {AutomationProcessPage} from "./AutomationProcessPage";
 import {NotificationComponent} from "../components/NotificationComponent";
 
@@ -15,8 +15,8 @@ export class AutomationProcessesListPage extends BaseListPage {
         await this.clickCreateNewRecord();
         const automationProcessPage = new AutomationProcessPage(this.page);
 
-        const newNodeManagementPanel = new NodePanel(
-            this.page.locator("#details_panel"),
+        const newNodeManagementPanel = new ParamsPanel(
+            this.page.locator("#root"),
         );
         await newNodeManagementPanel.fillForm(recordData);
         await automationProcessPage.clickButton("Create New");
